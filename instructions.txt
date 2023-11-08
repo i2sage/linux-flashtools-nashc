@@ -1,0 +1,5 @@
+1. Give executable permissions to mtk-install.sh and brom.sh
+2. Run mtk-install.sh first
+3. Then run brom.sh
+
+If mtk-install.sh finishes without error, no need to run it again. Simply run brom.sh from second time.

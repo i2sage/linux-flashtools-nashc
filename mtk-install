@@ -1,0 +1,54 @@
+#!/bin/bash
+
+echo -e "\e[1;32m\n----------BYPASS BROM FOR SP FLASH TOOL----------\e[0m\n"
+
+if [[ -d mtkclient ]]; then 
+    sudo rm -rf mtkclient
+else
+    echo "bx2nero" >>/dev/null  
+fi      
+
+echo -e "\nChoose your Distro:-"
+echo    "      1. Arch Distros."
+echo    "      2. Ubuntu Distros (Make sure you have 'universe' repository enabled)."
+echo    "      3. Fedora Distros."
+echo -e "      4. Quit.\n"
+
+read -p 'Enter Your Choice: ' distro
+
+if [[ $distro == "1" ]]; then
+    sudo pacman -Sy --needed --noconfirm git android-tools python-pip libusb libpng12
+elif [[ $distro == "2" ]]; then
+    sudo apt-get update
+    sudo apt-get install -y adb fastboot python3 python3-pip git libusb-1.0-0 build-essential zlib1g-dev
+    wget "https://ppa.launchpadcontent.net/linuxuprising/libpng12/ubuntu/pool/main/libp/libpng/libpng_1.2.54.orig.tar.xz"
+    tar Jxfv libpng_1.2.54.orig.tar.xz
+    cd libpng-1.2.54
+    ./configure
+    make
+    sudo make install
+    sudo ln -s /usr/local/lib/libpng12.so.0.54.0 /usr/lib/libpng12.so
+    sudo ln -s /usr/local/lib/libpng12.so.0.54.0 /usr/lib/libpng12.so.0
+    cd ..
+elif [[ $distro == "3" ]]; then
+    sudo dnf install -y git android-tools python-pip libusb libpng12   
+elif [[ $distro == "4" ]]; then
+    exit 0
+else 
+    echo -e "\e[1;31m\nINVALID INPUT:\e[0m $distro"
+    exit 0
+fi
+
+git clone https://github.com/bkerler/mtkclient
+cd mtkclient
+pip3 install -r requirements.txt
+python3 setup.py build
+sudo python3 setup.py install
+sudo groupadd dialout
+sudo groupadd plugdev
+sudo usermod -a -G dialout,plugdev $USER
+sudo cp Setup/Linux/*.rules /etc/udev/rules.d
+sudo udevadm control -R
+sleep 1
+echo -e "\e[1;32m\nPress any key to continue..\e[0m\n"
+read -n 1 -s -r
